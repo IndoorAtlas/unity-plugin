@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿// #define IA_VERBOSE
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -52,6 +53,11 @@ public class XcodeFixes {
 				UnityEngine.Debug.LogError ("Cocoapods not found. Make sure cocoapods is installed and/or consider adding IndoorAtlas SDK dependency manually to the generated XCode project.");
 				return;
 			}
+			#if IA_VERBOSE
+			else {
+				UnityEngine.Debug.Log ("Cocoapods found at " + pod);
+			}
+			#endif
 
 			// Run cocoapods to add IndoorAtlas SDK dependencies
 			// Overwrites if needed Podfile in the project path (otherwise Build&Run woudln't work).
@@ -62,9 +68,13 @@ public class XcodeFixes {
 				cocoapod.StartInfo.CreateNoWindow = true;
 				cocoapod.StartInfo.UseShellExecute = false;
 				cocoapod.StartInfo.WorkingDirectory = path;
+				cocoapod.StartInfo.RedirectStandardOutput = true;
+				cocoapod.StartInfo.RedirectStandardError = true;
 				cocoapod.Start ();
 				cocoapod.WaitForExit ();
 				if (cocoapod.ExitCode != 0) {
+					UnityEngine.Debug.Log("Cocoapods out: " + cocoapod.StandardOutput.ReadToEnd());
+					UnityEngine.Debug.Log("Cocoapods err: " + cocoapod.StandardError.ReadToEnd());
 					UnityEngine.Debug.LogError ("Failed running cocoapods. Make sure cocoapods is installed and you target to iOS 8.0 or newer.");
 				}
 			}
