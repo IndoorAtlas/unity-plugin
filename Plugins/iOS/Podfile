@@ -1,3 +1,5 @@
+use_frameworks!
+
 target 'Unity-iPhone' do
-  pod 'IndoorAtlas', '~> 2.5.1'
+  pod 'IndoorAtlas', '~> 2.5.2'
 end
