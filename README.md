@@ -39,6 +39,28 @@ Callback inputs can be parsed to IndoorAtlas data types using `JsonUtility.FromJ
 
 IndoorAtlas Unity Plugin starts calling component's callbacks immediatelly from the start of the app.
 
+### Coodinate systems
+
+This repository contains `WGSConversion` class (in `WGSConversion.cs` file) which can be used to convert IndoorAtlas SDK's (latitude, longitude) coordinates to metric (east, north) coordinates.
+
+
+#### A numerical example
+
+Set first a fixed point ("origin") to your 3D scene with `setOrigin` method, for example:
+
+```C#
+IndoorAtlas.WGSConversion temp = new IndoorAtlas.WGSConversion ();
+temp.setOrigin (63.357219, 27.403592);
+```
+
+Relative (east, north) transitions can be computed with `WGStoEN` method after the origin has been set, for example:
+```C#
+Vector2 eastNorth = temp.WGStoEN (63.357860, 27.402245);
+Debug.Log ("East-North transition: " + eastNorth.x + ", " + eastNorth.y);
+```
+
+This gives a transition of (-67.42091, 71.45055) _from origin_, that is, a transition of ~67 meters to west and ~71 meters to north _from origin_.
+
 
 ## Platform Specific
 ### iOS
@@ -52,7 +74,8 @@ IndoorAtlas Unity Plugin starts calling component's callbacks immediatelly from 
 
 ## Example
 
-There's an example Unity project in example project which controls main camera using IndoorAtlas SDK's output.
+There's an example Unity project in example project which controls main camera's orientation using IndoorAtlas SDK's
+orientation estimates.
 To build and run it on a real device, you have to fill a bundle identifier field in Player Settings and fill
 your IndoorAtlas credentials to `Ia Behavior` component in Main Camera component.
 
