@@ -183,6 +183,10 @@ public class IaUnityPlugin {
         }.init(headingSensitivity, orientationSensitivity));
     }
 
+    public String getTraceId() {
+        return mManager.getExtraInfo().traceId;
+    }
+
     public void close() {
         mManager.destroy();
     }
