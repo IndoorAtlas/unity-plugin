@@ -26,6 +26,12 @@
     [self.manager startUpdatingLocation];
 }
 
+- (const char *)traceId
+{
+    NSString *traceId = [self.manager.extraInfo objectForKey:kIATraceId];
+    return [traceId UTF8String];
+}
+
 - (void)close
 {
     [self.manager stopUpdatingLocation];

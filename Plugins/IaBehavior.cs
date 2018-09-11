@@ -35,6 +35,20 @@ public class IaBehavior : MonoBehaviour {
 	}
 
 	#if UNITY_IOS
+	[DllImport ("__Internal")] private static extern string traceID();
+	#endif
+	public string GetTraceID ()
+	{
+	#if UNITY_IOS
+		return traceID();
+	#elif UNITY_ANDROID
+		return iaJavaObject.Call<string>("getTraceId");
+	#else
+		return "";
+	#endif
+	}
+
+	#if UNITY_IOS
 	[DllImport ("__Internal")] private static extern bool IAclose ();
 	#endif
 	void OnDestroy () {

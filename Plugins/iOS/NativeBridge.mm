@@ -1,4 +1,5 @@
 #import "IAUnityPlugin.h"
+#include <string.h>
 
 IAUnityPlugin *_plugin = nil;
 
@@ -26,5 +27,15 @@ extern "C"
         NSString *object = [NSString stringWithUTF8String:gameObjectName];
         [_plugin init:object apiKey:key apiSecret:secret headingSensitivity:headingSensitivity orientationSensitivity:orientationSensitivity];
         return true;
+    }
+
+    const char* traceID()
+    {
+        if (_plugin == nil) {
+            return 0;
+        }
+        const char* traceId = [_plugin traceId];
+        char* output = (char*)calloc(strlen(traceId) + 1, 1);
+        return strcpy(output, traceId);
     }
 }

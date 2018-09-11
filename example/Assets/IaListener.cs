@@ -20,6 +20,7 @@ public class IaListener : MonoBehaviour {
 	void onStatusChanged(string data) {
 		IndoorAtlas.Status serviceStatus = JsonUtility.FromJson<IndoorAtlas.Status> (data);
 		Debug.Log ("onStatusChanged " + serviceStatus.status);
+		Debug.Log ("Trace ID: " + GetComponent<IaBehavior>().GetTraceID());
 	}
 
 	void onHeadingChanged(string data) {
