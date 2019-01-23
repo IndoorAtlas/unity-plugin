@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 
 using UnityEngine;
 using UnityEngine.Assertions;
+#if UNITY_ANDROID
+using UnityEngine.Android;
+#endif
 
 
 public class IaBehavior : MonoBehaviour {
@@ -14,14 +17,21 @@ public class IaBehavior : MonoBehaviour {
 	[Header("Orientation request configuration")]
 	public double headingSensitivity = 0.01f;
 	public double orientationSensitivity = 0.0001f;
-	#if UNITY_ANDROID
+#if UNITY_ANDROID
 	private AndroidJavaObject iaJavaObject;
-	#elif UNITY_IOS
-	#endif
+#elif UNITY_IOS
+#endif
 
 	// Initialization
 	void Start () {
-	#if UNITY_ANDROID
+#if UNITY_ANDROID
+        if (Permission.HasUserAuthorizedPermission(Permission.FineLocation)) {
+            Permission.RequestUserPermission(Permission.FineLocation);
+        }
+        if (Permission.HasUserAuthorizedPermission(Permission.CoarseLocation)) {
+            Permission.RequestUserPermission(Permission.CoarseLocation);
+        }
+        Input.location.Start();
 		AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity");
 		AndroidJavaObject joApikey = new AndroidJavaObject("java.lang.String", apiKey);
@@ -29,39 +39,39 @@ public class IaBehavior : MonoBehaviour {
 		AndroidJavaObject joGobjName = new AndroidJavaObject("java.lang.String", name);
 		iaJavaObject = new AndroidJavaObject ("com.indooratlas.android.unity.IaUnityPlugin",
 		jo, joApikey, joApisecret, joGobjName, headingSensitivity, orientationSensitivity);
-	#elif UNITY_IOS
+#elif UNITY_IOS
 		IAInit(apiKey, apiSecret, name, headingSensitivity, orientationSensitivity);
-	#endif
-	}
+#endif
+    }
 
-	#if UNITY_IOS
+#if UNITY_IOS
 	[DllImport ("__Internal")] private static extern string traceID();
-	#endif
-	public string GetTraceID ()
+#endif
+    public string GetTraceID ()
 	{
-	#if UNITY_IOS
+#if UNITY_IOS
 		return traceID();
-	#elif UNITY_ANDROID
+#elif UNITY_ANDROID
 		return iaJavaObject.Call<string>("getTraceId");
-	#else
+#else
 		return "";
-	#endif
+#endif
 	}
 
-	#if UNITY_IOS
+#if UNITY_IOS
 	[DllImport ("__Internal")] private static extern bool IAclose ();
-	#endif
+#endif
 	void OnDestroy () {
-	#if UNITY_ANDROID
+#if UNITY_ANDROID
 		iaJavaObject.Call("close");
-	#elif UNITY_IOS
+#elif UNITY_IOS
 		if (!IAclose()) {
 			throw new System.Exception("IndoorAtlas Unity plugin has to be initialized successfully before closing it");
 		}
-	#endif
+#endif
 	}
 
-	#if UNITY_IOS
+#if UNITY_IOS
 	[DllImport ("__Internal")] private static extern bool IAinit (string apikey, string apisecret, string name, double headingSensitivity, double orientationSensitivity);
 	public void IAInit (string apikey, string apisecret, string name, double headingSensitivity, double orientationSensitivity)
 	{
@@ -69,5 +79,5 @@ public class IaBehavior : MonoBehaviour {
 			throw new System.Exception("IndoorAtlas Unity plugin has already been initialized");
 		}
 	}
-	#endif
+#endif
 }
