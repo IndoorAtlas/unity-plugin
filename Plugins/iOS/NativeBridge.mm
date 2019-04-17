@@ -35,7 +35,13 @@ extern "C"
             return 0;
         }
         const char* traceId = [_plugin traceId];
-        char* output = (char*)calloc(strlen(traceId) + 1, 1);
-        return strcpy(output, traceId);
+        if (traceId != NULL) {
+            char* output = (char*)calloc(strlen(traceId) + 1, 1);
+            return strcpy(output, traceId);
+        } else {
+            char* output = (char*)calloc(1, 1);
+            *output = '\0';
+            return output;
+        }
     }
 }
