@@ -1,4 +1,3 @@
 .DS_Store
 androidwrapper/build/
-androidwrapper/gradle/
-*.gradle
+androidwrapper/.gradle/

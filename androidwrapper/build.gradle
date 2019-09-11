@@ -1,0 +1,65 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.0'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
+    }
+}
+
+apply plugin: 'android-library'
+
+android {
+    compileSdkVersion 23
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+   sourceSets {
+        main {
+            java {
+                srcDir 'src/main/java'
+            }
+        }
+    }
+}
+
+dependencies {
+    // Add UnityPlayer classes from the libs directory
+    provided fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile 'com.indooratlas.android:indooratlas-android-sdk:2.9.1@aar'
+    compile 'com.android.support:support-v4:13.0.0'
+    compile 'com.android.support:appcompat-v7:23.1.0'
+}
+
+repositories{
+    maven {
+        url "http://indooratlas-ltd.bintray.com/mvn-public"
+    }
+}
