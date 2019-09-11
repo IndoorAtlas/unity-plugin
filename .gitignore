@@ -1,3 +1,6 @@
 .DS_Store
-androidwrapper/build/
+.idea/
+androidwrapper/*.iml
 androidwrapper/.gradle/
+androidwrapper/build/
+androidwrapper/local.properties
