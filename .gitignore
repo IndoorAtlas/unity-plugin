@@ -4,3 +4,4 @@ androidwrapper/*.iml
 androidwrapper/.gradle/
 androidwrapper/build/
 androidwrapper/local.properties
+example/Logs/
