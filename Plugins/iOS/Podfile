@@ -1,5 +1,0 @@
-use_frameworks!
-
-target 'Unity-iPhone' do
-  pod 'IndoorAtlas'
-end

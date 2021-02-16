@@ -11,38 +11,39 @@ Getting started requires you to set up a free developer account and fingerprint 
 * To start developing your own app, create an [API key](https://app.indooratlas.com/apps).
 * An example Unity project is included in the example folder.
 
+It's recommended you use Unity version 2020.2.6f1 or higher.
+
 ## How to Use
-### Receiving location events
-
-At first, copy Plugins folder to your Unity project's Asset folder.
-
-To start receiving location events, you have to add a `IaBehavior.cs` script from Plugins folder to a component which implements the following functions:
-
-* `void onLocationChanged(string locationstr)`
-    - `string locationstr` is a JSON serialized `IndoorAtlas.Location` object.
-* `void onStatusChanged(string statusstr)`
-    - `string statusstr` is a JSON serialized `IndoorAtlas.Status` object.
-* `void onHeadingChanged(string headingstr)`
-    - `string headingstr` is a JSON serialized `IndoorAtlas.Heading` object.
-* `void onOrientationChange(string orientationstr)`
-    - `string locationstr` is a JSON serialized `IndoorAtlas.Location` object.
-* `void onEnterRegion (string regionstr)`
-* `void onExitRegion (string regionstr)`
-    - `string regionstr` is a JSON serialized `IndoorAtlas.Region` object.
-
-Callback inputs can be parsed to IndoorAtlas data types using `JsonUtility.FromJson`.
-
-`IaBehavior.cs` script has the following options which has to be filled before the positioning can start:
 
 * IndoorAtlas API key and secret. You can generate credentials from [our website](https://app.indooratlas.com/apps).
-* Orientation and heading sensitivity parameters (in the units of degree). These parameters control how often `onHeadingChanged` and `onOrientationChanged` callbacks are called. The smaller the sensitivity (degree) is, the smaller rotation triggers the callbacks.
 
-IndoorAtlas Unity Plugin starts calling component's callbacks immediatelly from the start of the app.
+## Example
+
+There's an example Unity project which implements basic AR wayfinding functionality using the `IndoorAtlas AR Wayfinding` component.
+To build and run it on a real device, you may have to change the bundle identifier field in the Player Settings and fill
+your IndoorAtlas credentials to `IndoorAtlas Session` component.
+
+NOTE: For the AR functionality you will need a API key with AR support enabled. Please contact IndoorAtlas sales for this!
+
+## Scripting
+
+There is a `IndoorAtlasApi.cs` included that wraps most of our Android and iOS SDK functionality to C#.
+You may use this api in your own components. To get callbacks from the Android and iOS SDK, your component should be children of `IndoorAtlas Session` component,
+and implement onei or more of the following methods:
+
+* IndoorAtlasOnLocationChanged
+* IndoorAtlasOnStatusChanged
+* IndoorAtlasOnHeadingChanged
+* IndoorAtlasOnOrientationChanged
+* IndoorAtlasOnEnterRegion
+* IndoorAtlasOnExitRegion
+* IndoorAtlasOnRoute
+
+To get better idea of how these callbacks work and what are their arguments, check the `IndoorAtlasSession.cs` source file.
 
 ### Coodinate systems
 
-This repository contains `WGSConversion` class (in `WGSConversion.cs` file) which can be used to convert IndoorAtlas SDK's (latitude, longitude) coordinates to metric (east, north) coordinates.
-
+This repository contains `WGSConversion` class (in `IndoorAtlasWGSConversion.cs` file) which can be used to convert IndoorAtlas SDK's (latitude, longitude) coordinates to metric (east, north) coordinates.
 
 #### A numerical example
 
@@ -61,31 +62,6 @@ Debug.Log ("East-North transition: " + eastNorth.x + ", " + eastNorth.y);
 
 This gives a transition of (-67.42091, 71.45055) _from origin_, that is, a transition of ~67 meters to west and ~71 meters to north _from origin_.
 
-
-## Platform Specific
-### iOS
-
-* You have to install [CocoaPods](https://cocoapods.org) dependency manager. For details see: [CocoaPods getting started](https://guides.cocoapods.org/using/getting-started.html)
-* The project has to target iOS 8.0 or newer.
-* The iOS plugin contains "XcodeFixes.cs" script which automates the following:
-    - Adds IndoorAtlas SDK dependency to the project using [CocoaPods](https://cocoapods.org)
-    - Adds NSLocationAlwaysUsageDescription and NSLocationWhenInUseUsageDescription plist entries.
-    - Disables bitcode.
-
-## Example
-
-There's an example Unity project in example project which controls main camera's orientation using IndoorAtlas SDK's
-orientation estimates.
-To build and run it on a real device, you have to fill a bundle identifier field in Player Settings and fill
-your IndoorAtlas credentials to `Ia Behavior` component in Main Camera component.
-
-## Known Issues
-
-* iOS builds have visually non-smooth orientation updates.
-* IaBehavior should be assigned to at most one component.
-
 ## License
 
-Copyright 2017 IndoorAtlas Ltd. The Unity Plugin is released under the Apache License. See the LICENSE file for details.
-
-
+Copyright 2021 IndoorAtlas Ltd. The Unity Plugin is released under the Apache License. See the LICENSE file for details.

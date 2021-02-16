@@ -5,3 +5,6 @@ androidwrapper/.gradle/
 androidwrapper/build/
 androidwrapper/local.properties
 example/Logs/
+Plugins/**/*.meta
+example/ios
+example/android
