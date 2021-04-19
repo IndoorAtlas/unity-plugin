@@ -265,6 +265,7 @@ static const char*
 nsstring_to_unity_string(NSString *str) {
     NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
     char *cpy = calloc(1, data.length + 1); // calloc initalizes with zero, thus zero terminates as well
+    assert(cpy && "calloc failed");
     memcpy(cpy, data.bytes, data.length);
     return cpy;
 }
