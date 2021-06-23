@@ -2,8 +2,30 @@ name: Create Unity Package
 on: push
 
 jobs:
-    echo:
+    package-private:
+        if: ${{ github.repository == 'IndoorAtlas/unity-plugin-private-new' }}
         runs-on: [self-hosted, Linux]
+        steps:
+            - uses: actions/checkout@v2
+            - run: |
+                mkdir Assets pkg
+                mv Plugins Assets/
+                cp example/Assets/Plugins.meta Assets/
+                echo "Assets/Plugins.meta" > metaList
+                find Assets -name \*.meta >> metaList
+                cat metaList
+            - uses: pCYSl5EDgo/create-unitypackage@master
+              with:
+                  package-path: pkg/indooratlas.unitypackage
+                  include-files: metaList
+            - uses: actions/upload-artifact@master
+              with:
+                  path: pkg
+                  name: indooratlas
+
+    package-public:
+        if: ${{ github.repository == 'IndoorAtlas/unity-plugin' }}
+        runs-on: [ubuntu-latest]
         steps:
             - uses: actions/checkout@v2
             - run: |
