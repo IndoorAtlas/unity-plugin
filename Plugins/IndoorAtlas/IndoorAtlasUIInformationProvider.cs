@@ -54,13 +54,15 @@ public class IndoorAtlasUIInformationProvider : MonoBehaviour {
     public Dropdown m_poi;
 
     void onPoiChanged() {
-        if (m_poi.value == 0) {
-            m_wayfinder.wayfinding = false;
-            return;
+        if (m_poi && m_wayfinder) {
+            if (m_poi.value == 0) {
+                m_wayfinder.wayfinding = false;
+                return;
+            }
+            if (currentVenue == null) return;
+            m_wayfinder.target = currentVenue.venue.pois[m_poi.value - 1].position;
+            m_wayfinder.wayfinding = true;
         }
-        if (currentVenue == null) return;
-        m_wayfinder.target = currentVenue.venue.pois[m_poi.value - 1].position;
-        m_wayfinder.wayfinding = true;
     }
 
     /// <summary>
@@ -69,51 +71,63 @@ public class IndoorAtlasUIInformationProvider : MonoBehaviour {
     public Dropdown poi {
         get { return m_poi; }
         set {
-            if (poiAction != null) m_poi.onValueChanged.RemoveListener(poiAction);
+            if (poiAction != null) {
+                if (m_poi) m_poi.onValueChanged.RemoveListener(poiAction);
+            }
             m_poi = value;
-            poiAction = delegate{onPoiChanged();};
-            m_poi.onValueChanged.AddListener(poiAction);
+            if (m_poi) {
+                poiAction = delegate{onPoiChanged();};
+                m_poi.onValueChanged.AddListener(poiAction);
+            } else if (poiAction != null) {
+                poiAction = null;
+            }
         }
     }
 
     void IndoorAtlasOnEnterRegion(Region region) {
-        m_region.text = region.name;
+        if (m_region) m_region.text = region.name;
         if (region.type == Region.Type.Venue) {
             currentVenue = region;
-            m_poi.ClearOptions();
-            List<string> options = new List<string>{"None"};
-            foreach (POI poi in currentVenue.venue.pois) options.Add(poi.name);
-            m_poi.AddOptions(options);
+            if (m_poi) {
+                m_poi.ClearOptions();
+                List<string> options = new List<string>{"None"};
+                foreach (POI poi in currentVenue.venue.pois) options.Add(poi.name);
+                m_poi.AddOptions(options);
+            }
         }
     }
 
     void IndoorAtlasOnExitRegion(Region region) {
         if (region.type == Region.Type.FloorPlan && currentVenue != null) {
-            m_region.text = currentVenue.name;
+            if (m_region) m_region.text = currentVenue.name;
         } else if (region.type == Region.Type.Venue) {
             currentVenue = null;
-            m_poi.ClearOptions();
-            List<string> options = new List<string>{"None"};
-            m_poi.AddOptions(options);
+            if (m_poi) {
+                m_poi.ClearOptions();
+                List<string> options = new List<string>{"None"};
+                m_poi.AddOptions(options);
+            }
         }
     }
 
     void UpdateText() {
-        m_traceId.text = manager.GetTraceId();
+        if (m_traceId) m_traceId.text = manager.GetTraceId();
     }
 
     void Awake() {
-        m_poi.ClearOptions();
-        List<string> options = new List<string>{"None"};
-        m_poi.AddOptions(options);
-        if (poiAction != null) m_poi.onValueChanged.RemoveListener(poiAction);
-        poiAction = delegate{onPoiChanged();};
-        m_poi.onValueChanged.AddListener(poiAction);
+        if (m_poi) {
+            m_poi.ClearOptions();
+            List<string> options = new List<string>{"None"};
+            m_poi.AddOptions(options);
+            if (poiAction != null) m_poi.onValueChanged.RemoveListener(poiAction);
+            poiAction = delegate{onPoiChanged();};
+            m_poi.onValueChanged.AddListener(poiAction);
+        }
     }
 
     void OnEnable() {
         manager = new LocationManager();
-        InvokeRepeating("UpdateText", 0.0f, 1.0f);
+        if (m_traceId) InvokeRepeating("UpdateText", 0.0f, 1.0f);
     }
 
     void OnDisable() {

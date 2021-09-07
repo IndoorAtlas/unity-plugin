@@ -40,7 +40,7 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
         get { return m_wayfinding; }
         set {
             if (m_wayfinding == value) return;
-            InstantiateTurns();
+            if (manager != null) InstantiateTurns();
             if ((m_wayfinding = value)) {
                 if (manager != null) {
                     manager.StartMonitoringForWayfinding(m_target);
@@ -152,13 +152,16 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
 
     [SerializeField]
     [Tooltip("The GameObject that represents a navigation turn instruction.")]
-    GameObject m_Turn;
+    GameObject m_turn;
     GameObject[] turns = null;
 
+    void SetObjectsActive(bool active) {
+        if (m_compass) m_compass.SetActive(active);
+        if (m_goal) m_goal.SetActive(active);
+        if (turns != null) foreach (GameObject turn in turns) turn.SetActive(active);
+    }
+
     void DestroyTurns() {
-        m_compass.SetActive(false);
-        m_goal.SetActive(false);
-        m_Turn.SetActive(false);
         if (turns != null) {
             for (int i = 1; i < turns.Length; ++i) Destroy(turns[i]);
             turns = null;
@@ -167,9 +170,12 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
 
     void InstantiateTurns() {
         DestroyTurns();
-        turns = new GameObject[16]; // pool of 16 maximum turns (pretty optimistic)
-        turns[0] = m_Turn;
-        for (int i = 1; i < turns.Length; ++i) turns[i] = Instantiate(m_Turn);
+        if (m_turn) {
+            m_turn.SetActive(false);
+            turns = new GameObject[16]; // pool of 16 maximum turns (pretty optimistic)
+            turns[0] = m_turn;
+            for (int i = 1; i < turns.Length; ++i) turns[i] = Instantiate(m_turn);
+        }
     }
 
     /// <summary>
@@ -177,8 +183,8 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
     /// </summary>
     public GameObject turn
     {
-        get { return m_Turn; }
-        set { m_Turn = value; InstantiateTurns(); }
+        get { return m_turn; }
+        set { m_turn = value; InstantiateTurns(); }
     }
 
     void Awake() {
@@ -189,7 +195,10 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
         if (manager != null) return;
         manager = new LocationManager();
         manager.GetArIsConverged(); // ensures that the ar session is created
-        if (m_wayfinding) manager.StartMonitoringForWayfinding(m_target);
+        if (m_wayfinding) {
+           manager.StopMonitoringForWayfinding();
+           manager.StartMonitoringForWayfinding(m_target);
+        }
         InstantiateTurns();
         Application.onBeforeRender += OnBeforeRender;
         RegisterFrameEvent();
@@ -203,33 +212,40 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
         manager.ReleaseArSession();
         manager = null;
         DestroyTurns();
+        SetObjectsActive(false);
     }
 
     void OnBeforeRender() {
         if (manager == null) return;
+
         manager.SetArCameraToWorldMatrix(m_camera.cameraToWorldMatrix);
         if (!m_wayfinding || !manager.GetArIsConverged() || !IsTracking()) {
-            m_compass.SetActive(false);
-            m_goal.SetActive(false);
-            foreach (GameObject turn in turns) turn.SetActive(false);
+            SetObjectsActive(false);
             return;
         }
+
         Matrix4x4 matrix;
-        if ((matrix = manager.GetArCompassMatrix()) != Matrix4x4.identity) {
-            m_compass.transform.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
-            m_compass.transform.position = matrix.GetColumn(3);
-            m_compass.SetActive(true);
-        } else {
-            m_compass.SetActive(false);
+        if (m_compass) {
+            if ((matrix = manager.GetArCompassMatrix()) != Matrix4x4.identity) {
+                m_compass.transform.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+                m_compass.transform.position = matrix.GetColumn(3);
+                m_compass.SetActive(true);
+            } else {
+                m_compass.SetActive(false);
+            }
         }
-        if ((matrix = manager.GetArGoalMatrix()) != Matrix4x4.identity) {
-            m_goal.transform.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
-            m_goal.transform.position = matrix.GetColumn(3);
-            m_goal.SetActive(true);
-        } else {
-            m_goal.SetActive(false);
+
+        if (m_goal) {
+            if ((matrix = manager.GetArGoalMatrix()) != Matrix4x4.identity) {
+                m_goal.transform.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+                m_goal.transform.position = matrix.GetColumn(3);
+                m_goal.SetActive(true);
+            } else {
+                m_goal.SetActive(false);
+            }
         }
-        {
+
+        if (turns != null) {
            int t = 0;
            int count = manager.GetArTurnCount();
            for (int i = 0; i < count && t < turns.Length; ++i) {
