@@ -272,12 +272,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb5d654324f42494d9a9f6086f740b77, type: 3}
---- !u!1 &87726506 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: cb5d654324f42494d9a9f6086f740b77,
-    type: 3}
-  m_PrefabInstance: {fileID: 87726505}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &178494243
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,7 +580,7 @@ MonoBehaviour:
   m_camera: {fileID: 1483523436}
   m_compass: {fileID: 807793368}
   m_goal: {fileID: 1144435238}
-  m_Turn: {fileID: 87726506}
+  m_turn: {fileID: 87726506}
 --- !u!1 &453936574
 GameObject:
   m_ObjectHideFlags: 0
