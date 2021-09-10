@@ -25,6 +25,8 @@ your IndoorAtlas credentials to `IndoorAtlas Session` component.
 
 NOTE: For the AR functionality you will need a API key with AR support enabled. Please contact IndoorAtlas sales for this!
 
+![Screenshot of the example](.github/screenshot.png)
+
 ## Scripting
 
 There is a `IndoorAtlasApi.cs` included that wraps most of our Android and iOS SDK functionality to C#.
