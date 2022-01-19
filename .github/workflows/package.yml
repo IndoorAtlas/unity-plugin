@@ -43,3 +43,10 @@ jobs:
               with:
                   path: pkg
                   name: indooratlas
+            - uses: softprops/action-gh-release@v1
+              if: startsWith(github.ref, 'refs/tags/')
+              with:
+                 files: pkg/indooratlas.unitypackage
+                 fail_on_unmatched_files: true
+              env:
+                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
