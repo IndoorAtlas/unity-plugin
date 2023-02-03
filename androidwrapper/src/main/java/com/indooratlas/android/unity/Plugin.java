@@ -183,6 +183,26 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
         }
     }
 
+    private String locationToJson(IALocation iaLocation) {
+        if (iaLocation == null) return "";
+        try {
+            JSONObject location = new JSONObject(), position = new JSONObject(), coordinate = new JSONObject();
+            location.put("accuracy", iaLocation.getAccuracy());
+            location.put("altitude", iaLocation.getAltitude());
+            location.put("bearing", iaLocation.getBearing());
+            coordinate.put("latitude", iaLocation.getLatitude());
+            coordinate.put("longitude", iaLocation.getLongitude());
+            position.put("coordinate", coordinate);
+            position.put("floor", iaLocation.getFloorLevel());
+            location.put("position", position);
+            location.put("timestamp", iaLocation.getTime());
+            return location.toString();
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
     @Override
     public void onEnterRegion(IARegion iaRegion) {
         UnityPlayer.UnitySendMessage(mGameObject, "NativeIndoorAtlasOnEnterRegion", regionToJson(iaRegion));
@@ -224,22 +244,7 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
 
     @Override
     public void onLocationChanged(IALocation iaLocation) {
-        try {
-            JSONObject location = new JSONObject(), position = new JSONObject(), coordinate = new JSONObject();
-            location.put("accuracy", iaLocation.getAccuracy());
-            location.put("altitude", iaLocation.getAltitude());
-            location.put("bearing", iaLocation.getBearing());
-            coordinate.put("latitude", iaLocation.getLatitude());
-            coordinate.put("longitude", iaLocation.getLongitude());
-            position.put("coordinate", coordinate);
-            position.put("floor", iaLocation.getFloorLevel());
-            location.put("position", position);
-            location.put("timestamp", iaLocation.getTime());
-            UnityPlayer.UnitySendMessage(mGameObject, "NativeIndoorAtlasOnLocationChanged", location.toString());
-        } catch (JSONException e) {
-            Log.e(TAG, e.toString());
-            throw new IllegalStateException(e.getMessage());
-        }
+        UnityPlayer.UnitySendMessage(mGameObject, "NativeIndoorAtlasOnLocationChanged", locationToJson(iaLocation));
     }
 
     @Override
@@ -511,5 +516,16 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
 
     public void addArPlane(float cx, float cy, float cz, float ex, float ez) {
         getArSession().addArPlane(new float[]{cx, cy, cz}, ex, ez);
+    }
+
+    public float[] geoToAr(double lat, double lon, int floor, float heading, float zOffset) {
+        float[] matrix = new float[16];
+        if (getArSession().geoToAr(lat, lon, floor, heading, zOffset, matrix)) return matrix;
+        return mNilMatrix;
+    }
+
+    public String arToGeo(float x, float y, float z) {
+        IALocation loc = getArSession().arToGeo(x, y, z);
+        return locationToJson(loc);
     }
 }

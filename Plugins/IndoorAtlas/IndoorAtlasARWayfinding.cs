@@ -155,15 +155,20 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
     GameObject m_turn;
     GameObject[] turns = null;
 
+    POI[] pois = null;
+    GameObject[] poi_objects = null;
+
     void SetObjectsActive(bool active) {
         if (m_compass) m_compass.SetActive(active);
         if (m_goal) m_goal.SetActive(active);
         if (turns != null) foreach (GameObject turn in turns) turn.SetActive(active);
+        if (poi_objects != null) foreach (GameObject poi in poi_objects) poi.SetActive(active);
     }
 
     void DestroyTurns() {
         if (turns != null) {
             for (int i = 1; i < turns.Length; ++i) Destroy(turns[i]);
+            m_turn.SetActive(false);
             turns = null;
         }
     }
@@ -175,6 +180,28 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
             turns = new GameObject[16]; // pool of 16 maximum turns (pretty optimistic)
             turns[0] = m_turn;
             for (int i = 1; i < turns.Length; ++i) turns[i] = Instantiate(m_turn);
+        }
+    }
+
+    void DestroyPOIObjects() {
+        if (poi_objects != null) {
+            for (int i = 0; i < poi_objects.Length; ++i) Destroy(poi_objects[i]);
+            poi_objects = null;
+        }
+    }
+
+    void InstantiatePOIObjects() {
+        DestroyPOIObjects();
+        if (pois != null) {
+            poi_objects = new GameObject[pois.Length];
+            for (int i = 0; i < pois.Length; ++i) {
+                var text = new GameObject(pois[i].id);
+                var mesh = text.AddComponent<TextMesh>();
+                text.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                mesh.text = pois[i].name;
+                text.SetActive(false);
+                poi_objects[i] = text;
+            }
         }
     }
 
@@ -257,6 +284,31 @@ public class IndoorAtlasARWayfinding : MonoBehaviour {
                }
            }
            for (; t < turns.Length; ++t) turns[t].SetActive(false);
+        }
+
+        if (pois != null) {
+           for (int i = 0; i < pois.Length; ++i) {
+               matrix = manager.GeoToAr(pois[i].position.coordinate.latitude, pois[i].position.coordinate.longitude, pois[i].position.floor, 0, 0.2f);
+               poi_objects[i].transform.rotation = Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+               poi_objects[i].transform.position = matrix.GetColumn(3);
+               poi_objects[i].transform.LookAt(m_camera.transform);
+               poi_objects[i].transform.Rotate(0, 180, 0);
+               poi_objects[i].SetActive(true);
+           }
+        }
+    }
+
+    void IndoorAtlasOnEnterRegion(Region region) {
+        if (region.type == Region.Type.Venue) {
+            pois = region.venue.pois;
+            InstantiatePOIObjects();
+        }
+    }
+
+    void IndoorAtlasOnExitRegion(Region region) {
+        if (region.type == Region.Type.Venue) {
+            DestroyPOIObjects();
+            pois = null;
         }
     }
 }
