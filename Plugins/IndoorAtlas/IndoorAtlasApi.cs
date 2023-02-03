@@ -603,5 +603,34 @@ public class LocationManager {
         jPlugin.Call("addArPlane", c.x, c.y, c.z, e.x, e.z);
 #endif
     }
+
+#if UNITY_IOS
+    [DllImport("__Internal")] private static extern void indooratlas_geoToAr(double lat, double lon, int floor, float heading, float zOffset, float[] matrix);
+#endif
+    public Matrix4x4 GeoToAr(double lat, double lon, int floor, float heading, float zOffset) {
+        Matrix4x4 matrix = Matrix4x4.identity;
+#if UNITY_IOS
+        float[] native = new float[16];
+        indooratlas_geoToAr(lat, lon, floor, heading, zOffset, native);
+        for (int i = 0; i < 16; ++i) matrix[i] = native[i];
+#elif UNITY_ANDROID
+        float[] native = jPlugin.Call<float[]>("geoToAr", lat, lon, floor, heading, zOffset);
+        if (native.Length == 16) for (int i = 0; i < 16; ++i) matrix[i] = native[i];
+#endif
+        return (matrix != Matrix4x4.identity ? IndoorAtlasMatrixToUnityMatrix(matrix) : matrix);
+    }
+
+#if UNITY_IOS
+    [DllImport("__Internal")] private static extern string indooratlas_arToGeo(double x, double y, double z);
+#endif
+    public Location ArToGeo(float x, float y, float z) {
+        Vector3 c = m_unityWorldToIndoorAtlasWorld.MultiplyPoint3x4(new Vector3(x, y, z));
+#if UNITY_IOS
+        string data = indooratlas_arToGeo(c.x, c.y, c.z);
+#elif UNITY_ANDROID
+        string data = jPlugin.Call<string>("arToGeo", c.x, c.y, c.z);
+#endif
+        return (data != "" ? JsonUtility.FromJson<Location>(data) : null);
+    }
 }
 }

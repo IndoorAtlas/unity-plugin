@@ -162,6 +162,25 @@ route_to_json(IARoute *route) {
            });
 }
 
+static NSString*
+location_to_json(IALocation *location) {
+    if (!location) return @"";
+    CLLocation *l = location.location;
+    return dict_to_json(@{
+          @"accuracy": @(l.horizontalAccuracy),
+          @"altitude": @(l.altitude),
+          @"bearing": @(l.course),
+          @"position": @{
+              @"coordinate": @{
+                  @"latitude": @(l.coordinate.latitude),
+                  @"longitude": @(l.coordinate.longitude)
+              },
+              @"floor": @(l.floor.level),
+          },
+          @"timestamp": @([l.timestamp timeIntervalSince1970])
+      });
+}
+
 @implementation IAUnityPlugin
 - (id)initWithObject:(NSString *)gameObjectName apiKey:(NSString *)apiKey apiSecret:(NSString *)apiSecret apiEndpoint:(NSString*)apiEndpoint {
     self = [super init];
@@ -181,20 +200,7 @@ route_to_json(IARoute *route) {
 
 - (void)indoorLocationManager:(IALocationManager*)manager didUpdateLocations:(NSArray*)locations {
     (void)manager;
-    CLLocation *l = [(IALocation*)locations.lastObject location];
-    NSString *json = dict_to_json(@{
-                @"accuracy": @(l.horizontalAccuracy),
-                @"altitude": @(l.altitude),
-                @"bearing": @(l.course),
-                @"position": @{
-                    @"coordinate": @{
-                        @"latitude": @(l.coordinate.latitude),
-                        @"longitude": @(l.coordinate.longitude)
-                    },
-                    @"floor": @(l.floor.level),
-                },
-                @"timestamp": @([l.timestamp timeIntervalSince1970])
-            });
+    NSString *json = location_to_json(locations.lastObject);
     UnitySendMessage(self.gameObject.UTF8String, "NativeIndoorAtlasOnLocationChanged", json.UTF8String);
 }
 
@@ -450,4 +456,17 @@ indooratlas_getArTurnMatrix(int index, float matrix[16]) {
 void
 indooratlas_addArPlane(float cx, float cy, float cz, float ex, float ez) {
     [_plugin.manager.arSession addPlaneWithCenterX:cx withCenterY:cy withCenterZ:cz withExtentX:ex withExtentZ:ez];
+}
+
+void
+indooratlas_geoToAr(double lat, double lon, int floor, float heading, float zOffset, float matrix[16]) {
+   CLLocationCoordinate2D coord = { lat, lon };
+   simd_float4x4 simd = [_plugin.manager.arSession geoToAr:coord floorNumber:floor heading:heading zOffset:zOffset];
+   simd_float4x4_to_unity_matrix(&simd, matrix);
+}
+
+const char*
+indooratlas_arToGeo(double x, double y, double z) {
+   IALocation *l = [_plugin.manager.arSession arToGeo:x Y:y Z:z];
+   return nsstring_to_unity_string(location_to_json(l));
 }
