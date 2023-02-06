@@ -11,8 +11,7 @@ jobs:
                 mkdir Assets pkg
                 mv Plugins Assets/
                 cp example/Assets/Plugins.meta Assets/
-                echo "Assets/Plugins.meta" > metaList
-                find Assets -name \*.meta >> metaList
+                find Assets -name \*.meta > metaList
                 cat metaList
             - uses: pCYSl5EDgo/create-unitypackage@master
               with:
@@ -32,8 +31,7 @@ jobs:
                 mkdir Assets pkg
                 mv Plugins Assets/
                 cp example/Assets/Plugins.meta Assets/
-                echo "Assets/Plugins.meta" > metaList
-                find Assets -name \*.meta >> metaList
+                find Assets -name \*.meta > metaList
                 cat metaList
             - uses: pCYSl5EDgo/create-unitypackage@master
               with:
