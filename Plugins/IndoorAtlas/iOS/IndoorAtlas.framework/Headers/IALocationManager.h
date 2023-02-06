@@ -148,7 +148,7 @@ INDOORATLAS_API
 /**
  * Mapped floors that the venue has
  */
-@property (nonatomic, readonly, nonnull) NSArray *floorplans;
+@property (nonatomic, readonly, nonnull) NSArray<IAFloorPlan*> *floorplans;
 /**
  * ID of the venue in IndoorAtlas developer console
  */
@@ -657,7 +657,8 @@ INDOORATLAS_API
  * If updates were deferred or if multiple locations arrived before they could be delivered, the array may contain additional entries.
  * The objects in the array are organized in the order in which they occured. Threfore, the most recent location update is at the end of the array.
  */
-- (void)indoorLocationManager:(nonnull IALocationManager*)manager didUpdateLocations:(nonnull NSArray*)locations;
+- (void)indoorLocationManager:(nonnull IALocationManager*)manager didUpdateLocations:(nonnull NSArray<IALocation*>*)locations;
+- (void)indoorLocationManager:(nonnull IALocationManager*)manager didUpdateLocationsDeprecated:(nonnull NSArray*)locations NS_SWIFT_NAME(indoorLocationManager(_:didUpdateLocations:));
 
 /**
  * Tells the delegate that the user entered the specified region.
