@@ -11,7 +11,7 @@ Getting started requires you to set up a free developer account and fingerprint 
 * To start developing your own app, create an [API key](https://app.indooratlas.com/apps).
 * An example Unity project is included in the example folder.
 
-It's recommended you use Unity version 2020.2.6f1 or higher.
+It's recommended you use Unity version 2021.3.17f1 or higher.
 
 ## How to Use
 
