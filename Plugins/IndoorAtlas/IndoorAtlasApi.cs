@@ -39,7 +39,7 @@ public class Location {
     // Bearing in degrees, in range of (0.0, 360.0].
     public float bearing;
     // Position information.
-    LatLngFloor position;
+    public LatLngFloor position;
     // UTC time of this location fix.
     public long timestamp;
 }
@@ -168,38 +168,38 @@ public class Status {
 [Serializable]
 public class RoutePoint {
     // Position of the point
-    LatLngFloor position;
+    public LatLngFloor position;
     // Zero-based index of the node in the original JSON graph this point corresponds to.
     // If this is a virtual wayfinding node, e.g., a strating point of the route outside
     // the original graph, nodeIndex will be -1.
-    int nodeIndex;
+    public int nodeIndex;
 }
 
 [Serializable]
 public class RouteLeg {
     // Starting point of the leg.
-    RoutePoint begin;
+    public RoutePoint begin;
     // Ending point of the leg.
-    RoutePoint end;
+    public RoutePoint end;
     // Lenght of the leg in meters.
-    double length;
+    public double length;
     // Direction of the leg in ENU coordinates in degrees.
     // 0 is North and 90 is East.
-    double direction;
+    public double direction;
     // Zero-based index of the edge corresponding to this leg in the original JSON graph.
     // If this is a virtual leg, for example, a segment connecting an off-graph starting
     // point to the graph, edgeIndex will be -1.
-    int edgeIndex;
+    public int edgeIndex;
 }
 
 [Serializable]
 public class Route {
     // Array of RouteLeg objects representing the route.
-    RouteLeg[] legs;
+    public RouteLeg[] legs;
     // Whether route is available
-    bool isSuccessful;
+    public bool isSuccessful;
     // Error status for routing
-    string error;
+    public string error;
 }
 
 public class LocationManager {
