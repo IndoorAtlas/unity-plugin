@@ -49,11 +49,11 @@ This repository contains `WGSConversion` class (in `IndoorAtlasWGSConversion.cs`
 
 #### A numerical example
 
-Set first a fixed point ("origin") to your 3D scene with `setOrigin` method, for example:
+Set first a fixed point ("origin") to your 3D scene with `SetOrigin` method, for example:
 
 ```C#
 IndoorAtlas.WGSConversion temp = new IndoorAtlas.WGSConversion ();
-temp.setOrigin (63.357219, 27.403592);
+temp.SetOrigin (63.357219, 27.403592);
 ```
 
 Relative (east, north) transitions can be computed with `WGStoEN` method after the origin has been set, for example:
