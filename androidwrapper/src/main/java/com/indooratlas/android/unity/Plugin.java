@@ -235,7 +235,7 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
             orientation.put("z", quaternion[3]);
             orientation.put("w", quaternion[0]);
             orientation.put("timestamp", timestamp);
-            UnityPlayer.UnitySendMessage(mGameObject, "NativeIndoorAtlasOnOrientationChange", orientation.toString());
+            UnityPlayer.UnitySendMessage(mGameObject, "NativeIndoorAtlasOnOrientationChanged", orientation.toString());
         } catch(JSONException e) {
             Log.e(TAG, e.toString());
             throw new IllegalStateException(e.getMessage());
