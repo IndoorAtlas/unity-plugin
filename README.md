@@ -21,7 +21,7 @@ It's recommended you use Unity version 2021.3.17f1 or higher.
 
 There's an example Unity project which implements basic AR wayfinding functionality using the `IndoorAtlas AR Wayfinding` component.
 To build and run it on a real device, you may have to change the bundle identifier field in the Player Settings and fill
-your IndoorAtlas credentials to `IndoorAtlas Session` component.
+your IndoorAtlas credentials to `IndoorAtlas Session` component. You'll need a location with POIs so you can choose a POI from the drop-down list to navigate to.
 
 NOTE: For the AR functionality you will need a API key with AR support enabled. Please contact IndoorAtlas sales for this!
 
