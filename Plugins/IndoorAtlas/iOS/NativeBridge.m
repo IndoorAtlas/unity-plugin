@@ -267,6 +267,17 @@ cstr_to_wayfinding_request(const char *str) {
     return request;
 }
 
+static IALocation*
+cstr_to_location(const char *str) {
+    NSDictionary *dict = cstr_to_dict(str);
+    CLLocationCoordinate2D coord = {
+       .latitude = [dict[@"position"][@"coordinate"][@"latitude"] doubleValue],
+       .longitude = [dict[@"position"][@"coordinate"][@"longitude"] doubleValue],
+    };
+    CLLocation *clLoc = [CLLocation initWithCoordinate:coord altitude:0 horizontalAccuracy:[dict[@"accuracy"] floatValue] verticalAccuracy:-1 timestamp:[NSDate date]];
+    return [IALocation locationWithCLLocation:clLoc andFloor:[IAFloor floorWithLevel:[dict[@"position"][@"floor"] intValue]]];
+}
+
 static const char*
 nsstring_to_unity_string(NSString *str) {
     NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
@@ -469,4 +480,9 @@ const char*
 indooratlas_arToGeo(double x, double y, double z) {
    IALocation *l = [_plugin.manager.arSession arToGeo:x Y:y Z:z];
    return nsstring_to_unity_string(location_to_json(l));
+}
+
+void
+indooratlas_setLocation(const char *location) {
+   [_plugin.manager setLocation:cstr_to_location(location)];
 }

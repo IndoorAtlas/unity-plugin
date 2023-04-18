@@ -632,5 +632,17 @@ public class LocationManager {
 #endif
         return (data != "" ? JsonUtility.FromJson<Location>(data) : null);
     }
+
+#if UNITY_IOS
+    [DllImport("__Internal")] private static extern void indooratlas_setLocation(string location);
+#endif
+    public void SetLocation(Location location) {
+        String json = JsonUtility.ToJson(location);
+#if UNITY_IOS
+        indooratlas_setLocation(json);
+#elif UNITY_ANDROID
+        jPlugin.Call("setLocation", json);
+#endif
+    }
 }
 }

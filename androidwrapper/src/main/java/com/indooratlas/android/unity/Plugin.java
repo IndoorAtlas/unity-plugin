@@ -528,4 +528,29 @@ public class Plugin implements IARegion.Listener, IALocationListener, IAWayfindi
         IALocation loc = getArSession().arToGeo(x, y, z);
         return locationToJson(loc);
     }
+
+    public void setLocation(String loc) {
+        try {
+            JSONObject target = new JSONObject(loc);
+            final double lat = target.getJSONObject("position").getJSONObject("coordinate").getDouble("latitude");
+            final double lon = target.getJSONObject("position").getJSONObject("coordinate").getDouble("longitude");
+            final int floor = target.getJSONObject("position").getInt("floor");
+            final float acc = (float)target.getDouble("accuracy");
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                   mLocationManager.setLocation(new IALocation.Builder()
+                         .withLatitude(lat)
+                         .withLongitude(lon)
+                         .withAccuracy(acc)
+                         .withFloorLevel(floor)
+                         .build());
+                }
+            };
+            mHandler.post(r);
+        } catch(JSONException e) {
+            Log.e(TAG, e.toString());
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
 }
